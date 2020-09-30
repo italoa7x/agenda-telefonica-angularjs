@@ -5,7 +5,7 @@
     <title>Lista telefonica</title>
     <style>
         .jumbotron {
-            width: 800px;
+            width: 600px;
             text-align: center;
             margin-top: 20px;
             margin-left: auto;
@@ -77,6 +77,7 @@
   <body ng-controller="listaTelefonicaController">
     <div class="jumbotron">
         <h3 class="title">{{ app }} </h3>
+        <input class="form-control" type="text" placeholder="Busque pelo nome." ng-model="criterioDeBusca"/>
         <br>
         <table ng-show="contatos.length > 0" class="table">
             <tr>
@@ -84,23 +85,25 @@
                 <th>Nome</th>
                 <th>Telefone</th>
                 <th>Operadora</th>
+                <th>Cor</th>
             </tr>
-            <tr ng-class="{selecionado: contato.selecionado}" ng-repeat="contato in contatos">
+            <tr ng-class="{selecionado: contato.selecionado}" ng-repeat="contato in contatos | filter:{nome: criterioDeBusca} | orderBy: 'nome'">
                 <td><input type="checkbox" ng-model="contato.selecionado"/></td>
                 <td>{{contato.nome}}</td>
                 <td>{{contato.telefone}}</td>
-                <td>{{contato.operadora.nome}}</td>
+                <td>{{contato.operadora}}</td>
                 <td><div style="width: 20px; height: 20px;" ng-style="{'background-color': contato.cor}"></div></td>
             </tr>
         </table>
         <hr>
         <form name="contatoForm">
             <input class="form-control" type="text" name="nome" ng-model="contato.nome" placeholder="nome" ng-required="true" ng-minlength="10" ng-maxlength="100"/>
-            <input class="form-control" type="text" name="telefone" ng-model="contato.telefone" placeholder="telefone" ng-required="true" ng-minlength="11" ng-maxlength="11"/>
-            <select class="form-control" ng-required="true" name="operadora" ng-model="contato.operadora" ng-options="operadora.nome group by operadora.categoria for operadora in operadoras">
+            <input class="form-control" type="text" name="telefone" ng-model="contato.telefone" placeholder="telefone" ng-required="true" ng-pattern="/^\d{4,5}-\d{4}$/"/>
+            <select class="form-control" ng-required="true" name="operadora" ng-model="contato.operadora" ng-options="operadora.nome group by operadora.categoria for operadora in operadoras | orderBy: 'nome'">
                 <option value="">Selecione uma operadora</option>
             </select>
         </form>
+
         <div class="alert alert-danger" ng-show="contatoForm.nome.$error.required && contatoForm.nome.$dirty">
             Por favor, o nome.
         </div>  
@@ -108,15 +111,13 @@
         <div class="alert alert-danger" ng-show="contatoForm.nome.$error.minlength">
             O campo nome deve ter no mínimo 10 caracteres.
         </div>
+
         <div class="alert alert-danger" ng-show="contatoForm.telefone.$error.required && contatoForm.telefone.$dirty">
             Por favor, o telefone.
         </div>
-        <div class="alert alert-danger" ng-show="contatoForm.telefone.$error.minlength">
-            O telefone deve ter 11 números.
-        </div>
-        
-        <div class="alert alert-danger" ng-show="contatoForm.telefone.$error.maxlength">
-            Você excedeu os 11 números.
+    
+        <div class="alert alert-danger" ng-show="contatoForm.telefone.$error.pattern">
+            O número deve ter o padrão xxxxx-xxxx
         </div>
 
         <div class="alert alert-danger" ng-show="contatoForm.operadora.$error.required && contatoForm.operadora.$dirty">
